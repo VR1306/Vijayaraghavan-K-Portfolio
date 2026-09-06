@@ -1,0 +1,86 @@
+@import "tailwindcss";
+@custom-variant dark (&:is(.dark *));
+
+/*
+  Two real drafting-print conventions, not just an inverted palette:
+  - light = "blueline" diazo print (navy ink on parchment paper)
+  - dark  = cyanotype "blueprint" (paper-white ink on navy)
+*/
+:root {
+  --surface: #F4F6F5;
+  --surface-deep: #E7ECE9;
+  --ink: #10202F;
+  --ink-dim: #3D5A73;
+  --line: #5B8FB0;
+  --accent: #A8632E;
+  --accent-bright: #8A5024;
+  --muted: #5C7488;
+  --on-accent: #F4F6F5;
+  --grid-color: rgba(15, 41, 71, 0.09);
+}
+
+.dark {
+  --surface: #0F2947;
+  --surface-deep: #0A1F38;
+  --ink: #EDF1F0;
+  --ink-dim: #C7D3D6;
+  --line: #5B8FB0;
+  --accent: #C97B3D;
+  --accent-bright: #E0954F;
+  --muted: #A6BBC7;
+  --on-accent: #0A1F38;
+  --grid-color: rgba(91, 143, 176, 0.16);
+}
+
+@theme inline {
+  --color-surface: var(--surface);
+  --color-surface-deep: var(--surface-deep);
+  --color-ink: var(--ink);
+  --color-ink-dim: var(--ink-dim);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-bright: var(--accent-bright);
+  --color-muted: var(--muted);
+  --color-on-accent: var(--on-accent);
+
+  --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent-bright);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .blueprint-grid {
+    background-image:
+      linear-gradient(var(--grid-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
