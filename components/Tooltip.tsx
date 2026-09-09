@@ -28,8 +28,10 @@ export function Tooltip({ label, children, className }: TooltipProps) {
       onBlur={() => setOpen(false)}
       aria-describedby={open ? tooltipId : undefined}
     >
-      {/* Truncation lives on its own box so its overflow-hidden never clips the tooltip below. */}
-      <span className={className}>{children}</span>
+      {/* `block` so width/overflow (e.g. ellipsis truncation) from `className` actually take effect —
+          a plain inline span ignores width/height entirely. Kept separate from the tooltip's own
+          positioning box so this element's overflow-hidden never clips the tooltip below. */}
+      <span className={`block ${className ?? ""}`}>{children}</span>
       <AnimatePresence>
         {open && (
           <motion.span
