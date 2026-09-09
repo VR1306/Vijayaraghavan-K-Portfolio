@@ -14,6 +14,8 @@ interface OpenMeteoResponse {
     weather_code: number[];
     temperature_2m_max: number[];
     temperature_2m_min: number[];
+    sunrise: string[];
+    sunset: string[];
   };
 }
 
@@ -34,7 +36,7 @@ export async function GET(request: NextRequest) {
   url.searchParams.set("latitude", lat.toFixed(4));
   url.searchParams.set("longitude", lon.toFixed(4));
   url.searchParams.set("current", "temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m");
-  url.searchParams.set("daily", "weather_code,temperature_2m_max,temperature_2m_min");
+  url.searchParams.set("daily", "weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset");
   url.searchParams.set("timezone", "auto");
   url.searchParams.set("forecast_days", "4");
 
@@ -62,6 +64,8 @@ export async function GET(request: NextRequest) {
         humidity: data.current.relative_humidity_2m,
         windKph: data.current.wind_speed_10m,
         code: data.current.weather_code,
+        sunrise: data.daily.sunrise?.[0],
+        sunset: data.daily.sunset?.[0],
       },
       forecast: data.daily.time.map((date, i) => ({
         date,

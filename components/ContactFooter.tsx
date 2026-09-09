@@ -6,7 +6,7 @@ export function ContactFooter() {
     <footer id="contact" className="scroll-mt-20 px-7 pb-10 pt-[70px]">
       <div className="mx-auto max-w-[1040px]">
         <div className="flex flex-wrap items-end justify-between gap-7.5 border-t border-line/15 pt-9">
-          <h2 className="max-w-[16ch] text-2xl font-semibold sm:text-4xl">
+          <h2 className="max-w-[16ch] font-display text-2xl font-bold tracking-tight sm:text-4xl">
             Building something that needs to be fast, secure, and hard to break? Let&rsquo;s talk.
           </h2>
           <div className="flex flex-col items-start gap-2.5">

@@ -12,24 +12,31 @@
   --ink: #10202F;
   --ink-dim: #3D5A73;
   --line: #5B8FB0;
-  --accent: #A8632E;
-  --accent-bright: #8A5024;
+  --accent: #A6812E;
+  --accent-bright: #8C6A1E;
   --muted: #5C7488;
   --on-accent: #F4F6F5;
   --grid-color: rgba(15, 41, 71, 0.09);
+
+  /* Sun palette is deliberately its own warm gold/amber scale, independent
+     of --accent (which is tuned for UI text/borders, not a glowing disc) —
+     and constant across light/dark ink themes, like the real sun is. */
+  --sun-core: #FFF3D6;
+  --sun-mid: #FFB74D;
+  --sun-edge: #FF8A3D;
 }
 
 .dark {
-  --surface: #0F2947;
-  --surface-deep: #0A1F38;
-  --ink: #EDF1F0;
-  --ink-dim: #C7D3D6;
+  --surface: #0D2542;
+  --surface-deep: #081B33;
+  --ink: #F2EFE6;
+  --ink-dim: #CBD6DD;
   --line: #5B8FB0;
-  --accent: #C97B3D;
-  --accent-bright: #E0954F;
+  --accent: #D6A94E;
+  --accent-bright: #F0C368;
   --muted: #A6BBC7;
-  --on-accent: #0A1F38;
-  --grid-color: rgba(91, 143, 176, 0.16);
+  --on-accent: #081B33;
+  --grid-color: rgba(214, 169, 78, 0.14);
 }
 
 @theme inline {
@@ -45,11 +52,24 @@
 
   --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
+  }
+
+  /*
+    A theme switch (manual or the auto day/night sync) should read as one
+    smooth cross-fade across the whole page, not a hard cut — every element
+    carrying a themed color eases into its new value together.
+  */
+  *,
+  *::before,
+  *::after {
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, fill 0.4s ease,
+      stroke 0.4s ease, box-shadow 0.4s ease;
   }
 
   body {
@@ -58,12 +78,27 @@
     font-family: var(--font-sans);
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
-    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   :focus-visible {
     outline: 2px solid var(--accent-bright);
     outline-offset: 2px;
+  }
+
+  /*
+    Chrome/Safari paint autofilled inputs (the browser's own saved email,
+    name, etc.) with a hardcoded yellow/blue tint that ignores background-color
+    entirely — the only reliable override is an inset box-shadow the size of
+    the field, with the color transition pushed out so it never flashes.
+  */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill {
+    -webkit-text-fill-color: var(--ink);
+    caret-color: var(--ink);
+    box-shadow: 0 0 0 1000px var(--surface) inset;
+    transition: background-color 9999s ease-in-out 0s, box-shadow 9999s ease-in-out 0s;
   }
 }
 
@@ -74,6 +109,187 @@
       linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
     background-size: 48px 48px;
   }
+}
+
+/*
+  Ambient sky: a decorative strip pinned behind the header/hero that reflects
+  the visitor's real local time (and, with consent, live weather). It's a
+  fixed 100vh layer masked to fade out well above the fold, so it never
+  competes with reading contrast further down the page.
+*/
+.ambient-sky {
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 38%, transparent 78%);
+  mask-image: linear-gradient(to bottom, black 0%, black 38%, transparent 78%);
+}
+
+.ambient-sky__gradient {
+  position: absolute;
+  inset: 0;
+  transition: opacity 4s ease;
+}
+
+/*
+  Whether it's day or night is decided purely by real local time (dayWeight)
+  — never by the .dark ink theme, so a reader in dark mode at 2pm still sees
+  an afternoon sky, not stars. What DOES change with the ink theme is the
+  day sky's color grade: a crisp bright blue for the light/paper theme, a
+  deep sapphire dusk-blue for the dark/cyanotype theme, so a "sunny
+  afternoon" always reads as intentional and premium in either theme rather
+  than a bright cartoon-blue sky clashing with dark chrome.
+*/
+.ambient-sky__gradient--day {
+  background: linear-gradient(to bottom, #7ec3ea 0%, #bfe1ef 42%, #eaf4ee 78%, transparent 100%);
+}
+
+.dark .ambient-sky__gradient--day {
+  background: linear-gradient(to bottom, #1c3f68 0%, #163457 42%, #0f2540 78%, transparent 100%);
+}
+
+.ambient-sky__gradient--night {
+  background: linear-gradient(to bottom, #050a17 0%, #0f2038 55%, #1c3350 100%);
+}
+
+.ambient-sky__glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(55% 40% at 50% 26%, var(--accent-bright) 0%, transparent 72%);
+  transition: opacity 3s ease;
+}
+
+.ambient-sky__body {
+  /* Baseline (horizon) sits well below the hero card's top edge; the rise
+     animation (see AmbientSky.tsx) lifts it toward noon but is capped short
+     of the sticky 64px header, so it's never clipped. */
+  position: absolute;
+  top: 120px;
+  width: 68px;
+  height: 68px;
+  margin-left: -34px;
+  transition: left 62s linear, transform 62s linear;
+}
+
+.ambient-sky__sun,
+.ambient-sky__moon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  animation: sky-body-breathe 7s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.ambient-sky__sun-rays {
+  animation: sky-sun-spin 90s linear infinite;
+  transform-origin: 32px 32px;
+}
+
+@keyframes sky-sun-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes sky-body-breathe {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.12); }
+}
+
+.ambient-sky__stars {
+  position: absolute;
+  inset: 0;
+  transition: opacity 3s ease;
+}
+
+.ambient-sky__star {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--ink-dim);
+  animation: sky-twinkle 3.2s ease-in-out infinite;
+}
+
+@keyframes sky-twinkle {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.95; }
+}
+
+.ambient-sky__cloud {
+  position: absolute;
+  left: -20%;
+  animation-name: sky-cloud-drift;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes sky-cloud-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(140vw); }
+}
+
+.ambient-sky__rain {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    115deg,
+    transparent 0,
+    transparent 11px,
+    color-mix(in srgb, var(--line) 55%, transparent) 11px,
+    color-mix(in srgb, var(--line) 55%, transparent) 12px
+  );
+  background-size: 22px 100%;
+  opacity: 0.4;
+  animation: sky-rain-fall 0.45s linear infinite;
+}
+
+.ambient-sky__rain--heavy {
+  opacity: 0.6;
+  animation-duration: 0.28s;
+  background-size: 16px 100%;
+}
+
+@keyframes sky-rain-fall {
+  from { background-position: 0 -20px; }
+  to { background-position: -14px 20px; }
+}
+
+.ambient-sky__flash {
+  position: absolute;
+  inset: 0;
+  background: var(--on-accent);
+  transition: opacity 0.12s ease-out;
+}
+
+.ambient-sky__fog {
+  position: absolute;
+  inset: 0;
+}
+
+.ambient-sky__fog-band {
+  position: absolute;
+  left: -30%;
+  width: 160%;
+  height: 14%;
+  background: linear-gradient(90deg, transparent, var(--muted), transparent);
+  opacity: 0.22;
+  animation-name: sky-fog-drift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes sky-fog-drift {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(8%); }
+}
+
+.ambient-sky__snow {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(color-mix(in srgb, var(--ink-dim) 70%, transparent) 1px, transparent 1.4px);
+  background-size: 26px 26px;
+  opacity: 0.5;
+  animation: sky-snow-fall 6s linear infinite;
+}
+
+@keyframes sky-snow-fall {
+  from { background-position: 0 0; }
+  to { background-position: 26px 220px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

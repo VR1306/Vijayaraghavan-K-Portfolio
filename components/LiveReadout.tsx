@@ -2,13 +2,11 @@
 
 import { useState } from "react";
 import { useLocalStorage } from "@/lib/useLocalStorage";
-import { useLiveWeather } from "@/lib/useLiveWeather";
+import { useWeatherContext } from "@/lib/WeatherProvider";
 import { describeWeatherCode } from "@/lib/weatherCodes";
 import { WeatherIcon } from "./WeatherIcon";
 import { PrivacyNotice } from "./PrivacyNotice";
 import { SectionFrame } from "./SectionFrame";
-
-type Consent = "unset" | "granted" | "denied";
 
 function formatDay(dateStr: string): string {
   const date = new Date(`${dateStr}T00:00:00`);
@@ -16,13 +14,11 @@ function formatDay(dateStr: string): string {
 }
 
 export function LiveReadout() {
-  const { value: consent, setValue: setConsent } = useLocalStorage<Consent>("liveDemoConsent", "unset");
+  const { consent, setConsent, weather } = useWeatherContext();
   const { value: name, setValue: setName, clear: clearName } = useLocalStorage<string>("visitorName", "");
   const [nameDraft, setNameDraft] = useState("");
   const [editingName, setEditingName] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
-
-  const weather = useLiveWeather(consent === "granted");
 
   const handleAllow = () => setConsent("granted");
   const handleDecline = () => setConsent("denied");
@@ -115,7 +111,8 @@ export function LiveReadout() {
             <p className="max-w-[46ch] text-sm text-ink-dim">
               Want a live local weather readout? I&rsquo;ll ask your browser for an approximate
               location (or estimate one from your IP if you say no to that prompt). Nothing is
-              stored on any server.
+              stored on any server. This also lets the sky behind the page reflect real conditions
+              where you are, instead of just the time of day.
             </p>
             <div className="flex shrink-0 flex-wrap gap-2.5">
               <button
