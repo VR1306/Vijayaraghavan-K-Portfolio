@@ -56,7 +56,10 @@ export function PrivacyNotice({ open, onClose, onRevoke, hasConsented }: Privacy
             <em>your device</em> for an approximate GPS position. If you decline or it&apos;s
             unavailable, we estimate a coarse location from your public IP address instead. Either
             way, coordinates are sent to our server only to request weather for that spot &mdash;
-            they are never written to a database or log file.
+            they are never written to a database or log file. The same weather also drives the
+            animated sky behind the page (rain, clouds, sunrise/sunset glow, and so on). Without
+            this permission, that backdrop still runs automatically off your device&apos;s clock
+            &mdash; it just won&apos;t reflect real conditions.
           </li>
           <li>
             <strong className="text-ink">IP address.</strong> Used transiently, server-side, only

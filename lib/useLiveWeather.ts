@@ -16,6 +16,9 @@ export interface CurrentWeather {
   humidity: number;
   windKph: number;
   code: number;
+  /** ISO 8601 local time (no offset) for today, from Open-Meteo's `timezone=auto`. */
+  sunrise?: string;
+  sunset?: string;
 }
 
 export interface ForecastDay {
@@ -87,8 +90,13 @@ async function fetchWeather(lat: number, lon: number) {
  * the browser's native Geolocation API first; if that's denied, unsupported,
  * or times out, it falls back to a coarse IP-based estimate via our own
  * /api/geo route rather than failing outright.
+ *
+ * `refreshMs`, if given, re-fetches on that interval so long as the tab is
+ * visible (skipped while backgrounded, to avoid pointless calls) — used by
+ * the ambient sky backdrop to keep conditions current without re-running
+ * geolocation on every refresh.
  */
-export function useLiveWeather(enabled: boolean) {
+export function useLiveWeather(enabled: boolean, refreshMs?: number) {
   const [state, setState] = useState<State>(INITIAL_STATE);
 
   const run = useCallback(async () => {
@@ -135,6 +143,14 @@ export function useLiveWeather(enabled: boolean) {
       setState(INITIAL_STATE);
     }
   }, [enabled, run]);
+
+  useEffect(() => {
+    if (!enabled || !refreshMs) return;
+    const id = setInterval(() => {
+      if (document.visibilityState === "visible") run();
+    }, refreshMs);
+    return () => clearInterval(id);
+  }, [enabled, refreshMs, run]);
 
   return { ...state, retry: run };
 }

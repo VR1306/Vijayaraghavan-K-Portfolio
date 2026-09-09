@@ -6,10 +6,10 @@ export interface Metric {
 }
 
 export const stats: Metric[] = [
-  { value: 2, label: "production apps secured" },
+  { value: 20, suffix: "+", label: "production apps secured" },
   { value: 200, prefix: "100\u2013", suffix: "+", label: "monthly active users served" },
-  { value: 80, prefix: "70\u2013", suffix: "%", label: "cut in production bugs" },
-  { value: 10, label: "junior engineers mentored" },
+  { value: 90, prefix: "80\u2013", suffix: "%", label: "cut in production bugs" },
+  { value: 10, suffix: "+", label: "junior engineers mentored" },
 ];
 
 export const experienceBullets: string[] = [
