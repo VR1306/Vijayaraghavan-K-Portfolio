@@ -14,12 +14,13 @@ const TITLE_BLOCK_FIELDS = [
 
 // Add more entries here to bring more photos into the rotation.
 // `caption` drives the "FIG. 0N — caption" callout under the photo frame.
+// Photos are 1024x1536 (2:3) — keep new additions at that ratio so the frame never wobbles.
 const PROFILE_PHOTOS = [
-  { src: "/vijay-profile.jpg", alt: site.name, caption: "Studio portrait" },
-  { src: "/vijay-profile-1.png", alt: site.name, caption: "Working session" },
-  { src: "/vijay-profile-2.png", alt: site.name, caption: "Conference headshot" },
-  { src: "/vijay-profile-3.png", alt: site.name, caption: "Team offsite" },
-  { src: "/vijay-profile-4.png", alt: site.name, caption: "Candid, on-site" },
+  { src: "/vijay-profile-1.jpg", alt: site.name, caption: "Studio portrait" },
+  { src: "/vijay-profile-2.png", alt: site.name, caption: "Working session" },
+  { src: "/vijay-profile-3.png", alt: site.name, caption: "Conference headshot" },
+  { src: "/vijay-profile-4.png", alt: site.name, caption: "Team offsite" },
+  { src: "/vijay-profile-5.png", alt: site.name, caption: "Candid, on-site" },
 ];
 
 export function Hero() {
@@ -94,7 +95,7 @@ export function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: [0.3, 0.7, 0.2, 1], delay: 0.3 }}
           >
-            <div className="group relative aspect-[4/5] w-28 overflow-hidden border border-accent bg-surface-deep shadow-[0_10px_30px_-12px_rgba(0,0,0,0.35)] sm:w-32 md:w-40">
+            <div className="group relative aspect-[2/3] w-28 overflow-hidden border border-accent bg-surface-deep shadow-[0_10px_30px_-12px_rgba(0,0,0,0.35)] sm:w-32 md:w-40">
               <div className="h-full w-full transition-transform duration-300 group-hover:scale-105">
                 <PhotoCarousel
                   images={PROFILE_PHOTOS}
@@ -110,7 +111,7 @@ export function Hero() {
             <span className="pointer-events-none absolute -right-1.5 -top-1.5 h-3.5 w-3.5 border-r-2 border-t-2 border-accent-bright" />
             <span className="pointer-events-none absolute -bottom-1.5 -left-1.5 h-3.5 w-3.5 border-b-2 border-l-2 border-accent-bright" />
             <span className="pointer-events-none absolute -bottom-1.5 -right-1.5 h-3.5 w-3.5 border-b-2 border-r-2 border-accent-bright" />
-            <p className="mt-2 text-center font-mono text-[10px] tracking-wider text-muted">
+            <p className="mt-2 h-4 w-28 overflow-hidden text-ellipsis whitespace-nowrap text-center font-mono text-[10px] tracking-wider text-muted sm:w-32 md:w-40">
               FIG. {figNumber} &mdash; {activePhoto.caption}
             </p>
           </motion.div>
