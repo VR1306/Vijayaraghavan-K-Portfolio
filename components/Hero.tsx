@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { site } from "@/data/site";
 import { PhotoCarousel } from "./PhotoCarousel";
@@ -12,16 +13,20 @@ const TITLE_BLOCK_FIELDS = [
 ];
 
 // Add more entries here to bring more photos into the rotation.
+// `caption` drives the "FIG. 0N — caption" callout under the photo frame.
 const PROFILE_PHOTOS = [
-  { src: "/vijay-profile.jpg", alt: site.name },
-  { src: "/vijay-profile-1.png", alt: site.name },
-  { src: "/vijay-profile-2.png", alt: site.name },
-  { src: "/vijay-profile-3.png", alt: site.name },
-  { src: "/vijay-profile-4.png", alt: site.name },
+  { src: "/vijay-profile.jpg", alt: site.name, caption: "Studio portrait" },
+  { src: "/vijay-profile-1.png", alt: site.name, caption: "Working session" },
+  { src: "/vijay-profile-2.png", alt: site.name, caption: "Conference headshot" },
+  { src: "/vijay-profile-3.png", alt: site.name, caption: "Team offsite" },
+  { src: "/vijay-profile-4.png", alt: site.name, caption: "Candid, on-site" },
 ];
 
 export function Hero() {
   const shouldReduceMotion = useReducedMotion();
+  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+  const activePhoto = PROFILE_PHOTOS[activePhotoIndex];
+  const figNumber = String(activePhotoIndex + 1).padStart(2, "0");
 
   return (
     <div className="mx-auto max-w-[1040px] px-7 pt-16">
@@ -96,6 +101,7 @@ export function Hero() {
                   intervalMs={5000}
                   priority
                   sizes="(min-width: 768px) 160px, (min-width: 640px) 128px, 112px"
+                  onIndexChange={setActivePhotoIndex}
                 />
               </div>
             </div>
@@ -105,7 +111,7 @@ export function Hero() {
             <span className="pointer-events-none absolute -bottom-1.5 -left-1.5 h-3.5 w-3.5 border-b-2 border-l-2 border-accent-bright" />
             <span className="pointer-events-none absolute -bottom-1.5 -right-1.5 h-3.5 w-3.5 border-b-2 border-r-2 border-accent-bright" />
             <p className="mt-2 text-center font-mono text-[10px] tracking-wider text-muted">
-              FIG. 01
+              FIG. {figNumber} &mdash; {activePhoto.caption}
             </p>
           </motion.div>
         </div>

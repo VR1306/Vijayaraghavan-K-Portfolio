@@ -14,6 +14,7 @@ interface PhotoCarouselProps {
   intervalMs?: number;
   sizes: string;
   priority?: boolean;
+  onIndexChange?: (index: number) => void;
 }
 
 /**
@@ -21,9 +22,13 @@ interface PhotoCarouselProps {
  * Pauses while the tab isn't visible (no point animating off-screen), and
  * collapses to an instant swap under prefers-reduced-motion.
  */
-export function PhotoCarousel({ images, intervalMs = 5000, sizes, priority }: PhotoCarouselProps) {
+export function PhotoCarousel({ images, intervalMs = 5000, sizes, priority, onIndexChange }: PhotoCarouselProps) {
   const [index, setIndex] = useState(0);
   const shouldReduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    onIndexChange?.(index);
+  }, [index, onIndexChange]);
 
   useEffect(() => {
     if (images.length <= 1) return;
