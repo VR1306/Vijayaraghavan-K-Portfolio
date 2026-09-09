@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { site } from "@/data/site";
 import { PhotoCarousel } from "./PhotoCarousel";
+import { Tooltip } from "./Tooltip";
 
 const TITLE_BLOCK_FIELDS = [
   { label: "DRAWN BY", value: site.name },
@@ -111,9 +112,12 @@ export function Hero() {
             <span className="pointer-events-none absolute -right-1.5 -top-1.5 h-3.5 w-3.5 border-r-2 border-t-2 border-accent-bright" />
             <span className="pointer-events-none absolute -bottom-1.5 -left-1.5 h-3.5 w-3.5 border-b-2 border-l-2 border-accent-bright" />
             <span className="pointer-events-none absolute -bottom-1.5 -right-1.5 h-3.5 w-3.5 border-b-2 border-r-2 border-accent-bright" />
-            <p className="mt-2 h-4 w-28 overflow-hidden text-ellipsis whitespace-nowrap text-center font-mono text-[10px] tracking-wider text-muted sm:w-32 md:w-40">
+            <Tooltip
+              label={`FIG. ${figNumber} — ${activePhoto.caption}`}
+              className="mt-2 h-4 w-28 cursor-default overflow-hidden text-ellipsis whitespace-nowrap text-center font-mono text-[10px] tracking-wider text-muted sm:w-32 md:w-40"
+            >
               FIG. {figNumber} &mdash; {activePhoto.caption}
-            </p>
+            </Tooltip>
           </motion.div>
         </div>
 
