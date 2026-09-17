@@ -6,20 +6,59 @@ import { ChatBot } from "@/components/ChatBot";
 import { AmbientSky } from "@/components/AmbientSky";
 import { ThemeAutoSync } from "@/components/ThemeAutoSync";
 import { WeatherProvider } from "@/lib/WeatherProvider";
-import { site } from "@/data/site";
+import { site, siteUrl } from "@/data/site";
 import "./globals.css";
 
+const titleText = `${site.name} \u2014 ${site.role}`;
+
 export const metadata: Metadata = {
-  title: `${site.name} \u2014 ${site.role}`,
+  metadataBase: new URL(siteUrl),
+  title: titleText,
   description: site.tagline,
+  keywords: [
+    "Vijayaraghavan K",
+    "Frontend Engineer",
+    "React Developer",
+    "Next.js Developer",
+    "TypeScript",
+    "Frontend Security",
+  ],
+  authors: [{ name: site.name, url: site.github }],
   icons: {
     icon: "/icon.svg",
   },
+  alternates: {
+    canonical: siteUrl,
+  },
   openGraph: {
-    title: `${site.name} \u2014 ${site.role}`,
+    title: titleText,
     description: site.tagline,
     type: "website",
+    url: siteUrl,
+    siteName: site.name,
   },
+  twitter: {
+    card: "summary_large_image",
+    title: titleText,
+    description: site.tagline,
+  },
+};
+
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: site.name,
+  jobTitle: site.role,
+  url: siteUrl,
+  email: `mailto:${site.email}`,
+  telephone: site.phone,
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Chennai",
+    addressRegion: "Tamil Nadu",
+    addressCountry: "IN",
+  },
+  sameAs: [site.linkedin, site.github],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -35,6 +74,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="relative min-h-screen" suppressHydrationWarning>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <WeatherProvider>
             <ThemeAutoSync />

@@ -17,9 +17,13 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ```
 app/
-  layout.tsx         Root layout — ThemeProvider, metadata, font <link>, background grid, scroll progress
+  layout.tsx         Root layout — ThemeProvider, metadata, font <link>, background grid, scroll progress, Person JSON-LD
   page.tsx            Assembles all sections
   globals.css         Tailwind v4 theme tokens (light "blueline" + dark "cyanotype") + base styles
+  opengraph-image.tsx  Dynamically generated 1200x630 OG/Twitter share image (next/og)
+  apple-icon.tsx       Dynamically generated 180x180 Apple touch icon (next/og)
+  sitemap.ts           Generates /sitemap.xml from data/site.ts's siteUrl
+  robots.ts            Generates /robots.txt, points crawlers at the sitemap
   api/geo/route.ts     Server-side IP geolocation (fallback when GPS is denied/unavailable)
   api/weather/route.ts Server-side weather proxy (Open-Meteo, no API key required)
 components/
@@ -94,6 +98,26 @@ Until you do that, the form shows a clear "not wired up yet" message instead of 
 Everything you'd actually want to change lives in `data/*.ts` — no need to touch component markup to update your role, contact info, skills, projects, or experience bullets. Metric numbers live in `data/experience.ts` as plain numbers so the count-up animation can drive them.
 
 To swap your résumé file, replace `public/resume.pdf` and keep the filename the same (or update `resumeHref` in `data/site.ts`).
+
+**If you attach a custom domain**, update `siteUrl` in `data/site.ts` — it drives `metadataBase`, the OG/canonical URLs, `sitemap.xml`, and `robots.txt`. It currently points at the default Vercel URL as a placeholder.
+
+**Project links**: `data/projects.ts`'s `Project` type has an optional `links` array (`{ label, url }[]`) — set it per project to show clickable links on `ProjectCard` (e.g. "View live", a product page); omit it for client work that can't be public.
+
+## SEO & sharing
+
+- `app/opengraph-image.tsx` and `app/apple-icon.tsx` generate share-preview and home-screen icons on the fly (via `next/og`), styled to match the blueprint theme — no static image asset to keep in sync.
+- `app/sitemap.ts` / `app/robots.ts` generate `/sitemap.xml` and `/robots.txt` from `siteUrl`.
+- `app/layout.tsx` emits a `Person` JSON-LD block (name, role, contact, `sameAs` links to LinkedIn/GitHub) for richer search results.
+
+## Testing & CI
+
+Component and logic tests run on Jest + React Testing Library:
+
+```bash
+npm test
+```
+
+`lib/matchChatTopic.test.ts` covers the FAQ bot's whole-word/phrase matching rules; `components/Highlight.test.tsx` covers the `**bold**` renderer. `.github/workflows/ci.yml` runs lint, tests, and a production build on every push/PR.
 
 ## Fonts
 
