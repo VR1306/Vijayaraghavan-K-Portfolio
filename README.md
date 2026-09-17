@@ -62,13 +62,13 @@ public/
 
 ## AI FAQ chatbot
 
-The floating chat launcher (bottom-right) is backed by the Claude API (`claude-haiku-4-5`). `app/api/chat/route.ts` streams a response from a system prompt built in `lib/portfolioContext.ts` from the same typed data the visible sections render (skills, experience, projects, award, education) — the model is instructed to answer only from those facts and to say "I don't know, use the contact form" for anything else, rather than guess.
+The floating chat launcher (bottom-right) is backed by the Claude API (`claude-haiku-4-5`). `app/api/chat/route.ts` attaches the actual `public/resume.pdf` to the first message as a real PDF document (`lib/resumeDocument.ts` reads and base64-encodes it) — the model reads the résumé itself rather than answering from a hand-duplicated summary of it. `lib/portfolioContext.ts` supplies a short system prompt with only the site-specific details that aren't necessarily in the résumé (exact contact/social links, live project URLs) and instructs the model to treat the résumé as the source of truth and say "I don't know, use the contact form" for anything outside that scope.
 
-**Setup:** copy `.env.example` to `.env.local`, get a key at [console.anthropic.com](https://console.anthropic.com/settings/keys), and set `ANTHROPIC_API_KEY`. Add the same variable in your Vercel project's Environment Variables when you deploy.
+**Setup:** copy `.env.example` to `.env.local`, get a key at [console.anthropic.com](https://console.anthropic.com/settings/keys), and set `ANTHROPIC_API_KEY`. Add the same variable in your Vercel project's Environment Variables when you deploy. If you swap in a new `public/resume.pdf`, the chatbot picks it up automatically — no other changes needed.
 
 **Without a key**, or if the API call errors or gets rate-limited, the chatbot automatically falls back to the original **rule-based** matcher (`lib/matchChatTopic.ts` + `data/chatbot.ts`) — a keyword-scored lookup against canned answers, no API key or network call required. It matches whole words for single-word keywords (so "yo" won't fire on "you"/"your") and substrings for multi-word phrases, with an honest fallback message when nothing matches. This keeps the widget working out of the box for anyone who clones the repo without setting up a key.
 
-**Cost & abuse guardrails:** `app/api/chat/route.ts` caps message length and conversation length, and applies a best-effort in-memory rate limit (20 messages / 10 min per IP — resets on cold start, not shared across serverless instances, so treat it as a courtesy brake rather than a hard limit). The system prompt is cached (`cache_control: ephemeral`) since it's identical across requests.
+**Cost & abuse guardrails:** `app/api/chat/route.ts` caps message length and conversation length, and applies a best-effort in-memory rate limit (20 messages / 10 min per IP — resets on cold start, not shared across serverless instances, so treat it as a courtesy brake rather than a hard limit). Both the system prompt and the résumé document are cached (`cache_control: ephemeral`) since they're identical across requests within a conversation.
 
 To add a new fallback topic: add an entry to the `chatTopics` array in `data/chatbot.ts` with a list of keywords and an `answer()` function. Add a `suggestion` string if you also want it to appear as a quick-reply chip.
 

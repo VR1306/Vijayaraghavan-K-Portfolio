@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import { SYSTEM_PROMPT } from "@/lib/portfolioContext";
+import { getResumeBase64 } from "@/lib/resumeDocument";
 
 export const runtime = "nodejs";
 
@@ -35,6 +36,33 @@ function isRateLimited(key: string): boolean {
 function clientKey(request: NextRequest): string {
   const forwarded = request.headers.get("x-forwarded-for");
   return forwarded?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "unknown";
+}
+
+/**
+ * The client seeds a static greeting as the first "bot" turn in the UI, but
+ * the Anthropic API requires the conversation to start on a user turn — drop
+ * any leading assistant messages, then attach the résumé PDF to the first
+ * real user message so it's grounded in the actual document, not a
+ * hand-duplicated summary of it.
+ */
+function toClaudeMessages(messages: ChatMessage[], resumeBase64: string): Anthropic.MessageParam[] {
+  const trimmed = [...messages];
+  while (trimmed.length > 0 && trimmed[0].role === "assistant") trimmed.shift();
+
+  return trimmed.map((m, i): Anthropic.MessageParam => {
+    if (i !== 0) return { role: m.role, content: m.content };
+    return {
+      role: "user",
+      content: [
+        {
+          type: "document",
+          source: { type: "base64", media_type: "application/pdf", data: resumeBase64 },
+          cache_control: { type: "ephemeral" },
+        },
+        { type: "text", text: m.content },
+      ],
+    };
+  });
 }
 
 function isValidHistory(messages: unknown): messages is ChatMessage[] {
@@ -74,6 +102,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "Invalid message history." }, { status: 400 });
   }
 
+  let resumeBase64: string;
+  try {
+    resumeBase64 = getResumeBase64();
+  } catch (err) {
+    console.error("[api/chat] couldn't read résumé:", err instanceof Error ? err.message : err);
+    return NextResponse.json({ ok: false, error: "AI chat is not configured." }, { status: 503 });
+  }
+
   const client = new Anthropic();
   const encoder = new TextEncoder();
 
@@ -83,7 +119,7 @@ export async function POST(request: NextRequest) {
         model: MODEL,
         max_tokens: 500,
         system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
-        messages: body.messages as ChatMessage[],
+        messages: toClaudeMessages(body.messages as ChatMessage[], resumeBase64),
       });
 
       claudeStream.on("text", (text) => {
