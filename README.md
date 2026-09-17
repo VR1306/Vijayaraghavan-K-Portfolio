@@ -26,6 +26,7 @@ app/
   robots.ts            Generates /robots.txt, points crawlers at the sitemap
   api/geo/route.ts     Server-side IP geolocation (fallback when GPS is denied/unavailable)
   api/weather/route.ts Server-side weather proxy (Open-Meteo, no API key required)
+  api/chat/route.ts    Streams Claude API responses for the AI FAQ chatbot (ANTHROPIC_API_KEY)
 components/
   Header.tsx          Sticky nav with scrollspy, mobile menu, theme toggle
   ThemeToggle.tsx      Light/dark switch (next-themes, persisted, no flash-of-wrong-theme)
@@ -33,7 +34,7 @@ components/
   LiveReadout.tsx      Live demo: personalization + consent gate + weather/forecast
   PrivacyNotice.tsx    Modal explaining exactly what's collected, with a one-click revoke
   WeatherIcon.tsx       Small monoline weather icon set matching the blueprint aesthetic
-  ChatBot.tsx          Floating rule-based FAQ widget (no AI, no API key, no network calls)
+  ChatBot.tsx          Floating AI FAQ widget (Claude API, streamed) with a rule-based fallback
   ScrollProgress.tsx   Copper progress line under the header
   SectionFrame.tsx     Shared "sheet number + heading" wrapper
   SkillsSection.tsx    "Systems" — skills grid
@@ -59,13 +60,17 @@ public/
   resume.pdf           Downloaded via the hero's "Download résumé" button
 ```
 
-## FAQ chatbot
+## AI FAQ chatbot
 
-The floating chat launcher (bottom-right) is a **rule-based** bot, not an AI integration — no API key, no external calls, no per-message cost, and no risk of it saying something you didn't write. It matches a visitor's message against keyword sets defined in `data/chatbot.ts` and returns a canned answer composed from the same typed data used elsewhere on the site (skills, experience stats, projects, award, education).
+The floating chat launcher (bottom-right) is backed by the Claude API (`claude-haiku-4-5`). `app/api/chat/route.ts` streams a response from a system prompt built in `lib/portfolioContext.ts` from the same typed data the visible sections render (skills, experience, projects, award, education) — the model is instructed to answer only from those facts and to say "I don't know, use the contact form" for anything else, rather than guess.
 
-Matching requires whole-word matches for single-word keywords (so, e.g., "yo" won't accidentally fire on "you" or "your" — an actual bug caught and fixed while testing this) and substring matches for multi-word phrases. Anything that doesn't match a topic gets an honest "I don't have an answer for that" fallback pointing to the contact form, rather than a made-up response.
+**Setup:** copy `.env.example` to `.env.local`, get a key at [console.anthropic.com](https://console.anthropic.com/settings/keys), and set `ANTHROPIC_API_KEY`. Add the same variable in your Vercel project's Environment Variables when you deploy.
 
-To add a new topic: add an entry to the `chatTopics` array in `data/chatbot.ts` with a list of keywords and an `answer()` function. Add a `suggestion` string if you also want it to appear as a quick-reply chip.
+**Without a key**, or if the API call errors or gets rate-limited, the chatbot automatically falls back to the original **rule-based** matcher (`lib/matchChatTopic.ts` + `data/chatbot.ts`) — a keyword-scored lookup against canned answers, no API key or network call required. It matches whole words for single-word keywords (so "yo" won't fire on "you"/"your") and substrings for multi-word phrases, with an honest fallback message when nothing matches. This keeps the widget working out of the box for anyone who clones the repo without setting up a key.
+
+**Cost & abuse guardrails:** `app/api/chat/route.ts` caps message length and conversation length, and applies a best-effort in-memory rate limit (20 messages / 10 min per IP — resets on cold start, not shared across serverless instances, so treat it as a courtesy brake rather than a hard limit). The system prompt is cached (`cache_control: ephemeral`) since it's identical across requests.
+
+To add a new fallback topic: add an entry to the `chatTopics` array in `data/chatbot.ts` with a list of keywords and an `answer()` function. Add a `suggestion` string if you also want it to appear as a quick-reply chip.
 
 ## The "Live" panel — theming, weather, location & privacy
 
@@ -137,4 +142,4 @@ The easiest deploy path is [Vercel](https://vercel.com/new) (made by the Next.js
 - All copy and metrics reflect real, verified information — nothing was fabricated to fill a placeholder.
 - Motion respects `prefers-reduced-motion`: the hero's draw-in animation and stat counters resolve instantly for anyone who has that setting on.
 - The `/api/geo` and `/api/weather` routes call ipwho.is and Open-Meteo respectively — both free, keyless services — so they need normal outbound internet access from wherever you deploy. Both fail gracefully with clear messages and a "Try again" button if a lookup is blocked or times out.
-- No database or environment variables required — this is a fully static-renderable site except for the two API routes, which are stateless.
+- No database is required. `ANTHROPIC_API_KEY` is the one optional environment variable — everything else, including `/api/geo` and `/api/weather`, needs no configuration.
