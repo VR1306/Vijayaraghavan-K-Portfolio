@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { chatTopics } from "@/data/chatbot";
 import { matchChatTopic } from "@/lib/matchChatTopic";
+import { site } from "@/data/site";
 
 interface Message {
   id: string;
@@ -11,12 +12,31 @@ interface Message {
 }
 
 const SUGGESTIONS = chatTopics.filter((t) => t.suggestion).map((t) => t.suggestion as string);
-const GREETING = chatTopics.find((t) => t.id === "greeting")!.answer();
+const GREETING = `Hi! Ask me anything about ${site.name}'s background, skills, or projects.`;
+const FALLBACK_NOTICE =
+  "(The AI assistant is unavailable right now, so this reply comes from a simpler rule-based fallback.)";
 
 let idCounter = 0;
 function nextId() {
   idCounter += 1;
   return `msg-${idCounter}`;
+}
+
+/** Reads a fetch Response body as a stream, calling onChunk with each decoded text piece. */
+async function streamText(response: Response, onChunk: (chunk: string) => void): Promise<void> {
+  const reader = response.body?.getReader();
+  if (!reader) return;
+  const decoder = new TextDecoder();
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    onChunk(decoder.decode(value, { stream: true }));
+  }
+}
+
+function fallbackReply(trimmed: string, warnFirst: boolean): string {
+  const answer = matchChatTopic(trimmed);
+  return warnFirst ? `${FALLBACK_NOTICE}\n\n${answer}` : answer;
 }
 
 export function ChatBot() {
@@ -26,6 +46,7 @@ export function ChatBot() {
   ]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
+  const hasWarnedFallback = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -46,19 +67,49 @@ export function ChatBot() {
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
 
-  function send(text: string) {
+  async function send(text: string) {
     const trimmed = text.trim();
     if (!trimmed) return;
 
-    setMessages((prev) => [...prev, { id: nextId(), role: "user", text: trimmed }]);
+    const history = [...messages, { id: nextId(), role: "user" as const, text: trimmed }];
+    setMessages(history);
     setInput("");
     setTyping(true);
 
-    const answer = matchChatTopic(trimmed);
-    window.setTimeout(() => {
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: history.map((m) => ({
+            role: m.role === "bot" ? "assistant" : "user",
+            content: m.text,
+          })),
+        }),
+      });
+
+      if (!res.ok || !res.body) throw new Error(`chat request failed: ${res.status}`);
+
+      const botId = nextId();
+      let firstChunk = true;
+      await streamText(res, (chunk) => {
+        setTyping(false);
+        setMessages((prev) =>
+          firstChunk
+            ? [...prev, { id: botId, role: "bot", text: chunk }]
+            : prev.map((m) => (m.id === botId ? { ...m, text: m.text + chunk } : m))
+        );
+        firstChunk = false;
+      });
+      if (firstChunk) throw new Error("empty stream");
+    } catch {
+      const warnFirst = !hasWarnedFallback.current;
+      hasWarnedFallback.current = true;
+      const answer = fallbackReply(trimmed, warnFirst);
       setMessages((prev) => [...prev, { id: nextId(), role: "bot", text: answer }]);
+    } finally {
       setTyping(false);
-    }, 380);
+    }
   }
 
   return (
@@ -71,7 +122,7 @@ export function ChatBot() {
         >
           <div className="flex items-center justify-between border-b border-line/15 bg-surface-deep px-4 py-3">
             <div>
-              <p className="font-mono text-[11px] tracking-wide text-muted">FAQ BOT</p>
+              <p className="font-mono text-[11px] tracking-wide text-muted">AI ASSISTANT</p>
               <p className="text-sm font-semibold text-ink">Ask about Vijay</p>
             </div>
             <button
@@ -91,7 +142,7 @@ export function ChatBot() {
             {messages.map((m) => (
               <div
                 key={m.id}
-                className={`max-w-[85%] px-3 py-2 text-[13px] leading-relaxed ${
+                className={`max-w-[85%] whitespace-pre-line px-3 py-2 text-[13px] leading-relaxed ${
                   m.role === "user"
                     ? "ml-auto border border-accent/40 bg-accent/10 text-ink"
                     : "border border-line/15 text-ink-dim"

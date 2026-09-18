@@ -27,6 +27,22 @@ export function ProjectCard({ project }: { project: Project }) {
           <li key={point}>{point}</li>
         ))}
       </ul>
+
+      {project.links && project.links.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-4 font-mono text-[12.5px]">
+          {project.links.map((link) => (
+            <a
+              key={link.url}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border-b border-line/15 pb-0.5 text-accent-bright transition-colors hover:border-accent"
+            >
+              {link.label} &rarr;
+            </a>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -30,6 +30,14 @@ export function ContactFooter() {
             >
               {site.linkedinLabel}
             </a>
+            <a
+              href={site.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border-b border-line/15 pb-0.5 font-mono text-sm text-ink-dim transition-colors hover:border-accent hover:text-accent-bright"
+            >
+              {site.githubLabel}
+            </a>
           </div>
         </div>
 

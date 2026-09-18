@@ -159,6 +159,14 @@ export function Hero() {
             Connect on LinkedIn
           </a>
           <a
+            href={site.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="border border-line/20 px-5 py-3 font-mono text-[13px] tracking-wide text-muted transition-colors hover:border-muted hover:text-ink"
+          >
+            GitHub
+          </a>
+          <a
             href={site.resumeHref}
             download
             className="border border-line/20 px-5 py-3 font-mono text-[13px] tracking-wide text-muted transition-colors hover:border-muted hover:text-ink"

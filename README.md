@@ -17,11 +17,16 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ```
 app/
-  layout.tsx         Root layout — ThemeProvider, metadata, font <link>, background grid, scroll progress
+  layout.tsx         Root layout — ThemeProvider, metadata, font <link>, background grid, scroll progress, Person JSON-LD
   page.tsx            Assembles all sections
   globals.css         Tailwind v4 theme tokens (light "blueline" + dark "cyanotype") + base styles
+  opengraph-image.tsx  Dynamically generated 1200x630 OG/Twitter share image (next/og)
+  apple-icon.tsx       Dynamically generated 180x180 Apple touch icon (next/og)
+  sitemap.ts           Generates /sitemap.xml from data/site.ts's siteUrl
+  robots.ts            Generates /robots.txt, points crawlers at the sitemap
   api/geo/route.ts     Server-side IP geolocation (fallback when GPS is denied/unavailable)
   api/weather/route.ts Server-side weather proxy (Open-Meteo, no API key required)
+  api/chat/route.ts    Streams Claude API responses for the AI FAQ chatbot (ANTHROPIC_API_KEY)
 components/
   Header.tsx          Sticky nav with scrollspy, mobile menu, theme toggle
   ThemeToggle.tsx      Light/dark switch (next-themes, persisted, no flash-of-wrong-theme)
@@ -29,7 +34,7 @@ components/
   LiveReadout.tsx      Live demo: personalization + consent gate + weather/forecast
   PrivacyNotice.tsx    Modal explaining exactly what's collected, with a one-click revoke
   WeatherIcon.tsx       Small monoline weather icon set matching the blueprint aesthetic
-  ChatBot.tsx          Floating rule-based FAQ widget (no AI, no API key, no network calls)
+  ChatBot.tsx          Floating AI FAQ widget (Claude API, streamed) with a rule-based fallback
   ScrollProgress.tsx   Copper progress line under the header
   SectionFrame.tsx     Shared "sheet number + heading" wrapper
   SkillsSection.tsx    "Systems" — skills grid
@@ -55,13 +60,17 @@ public/
   resume.pdf           Downloaded via the hero's "Download résumé" button
 ```
 
-## FAQ chatbot
+## AI FAQ chatbot
 
-The floating chat launcher (bottom-right) is a **rule-based** bot, not an AI integration — no API key, no external calls, no per-message cost, and no risk of it saying something you didn't write. It matches a visitor's message against keyword sets defined in `data/chatbot.ts` and returns a canned answer composed from the same typed data used elsewhere on the site (skills, experience stats, projects, award, education).
+The floating chat launcher (bottom-right) is backed by the Claude API (`claude-haiku-4-5`). `app/api/chat/route.ts` attaches the actual `public/resume.pdf` to the first message as a real PDF document (`lib/resumeDocument.ts` reads and base64-encodes it) — the model reads the résumé itself rather than answering from a hand-duplicated summary of it. `lib/portfolioContext.ts` supplies a short system prompt with only the site-specific details that aren't necessarily in the résumé (exact contact/social links, live project URLs) and instructs the model to treat the résumé as the source of truth and say "I don't know, use the contact form" for anything outside that scope.
 
-Matching requires whole-word matches for single-word keywords (so, e.g., "yo" won't accidentally fire on "you" or "your" — an actual bug caught and fixed while testing this) and substring matches for multi-word phrases. Anything that doesn't match a topic gets an honest "I don't have an answer for that" fallback pointing to the contact form, rather than a made-up response.
+**Setup:** copy `.env.example` to `.env.local`, get a key at [console.anthropic.com](https://console.anthropic.com/settings/keys), and set `ANTHROPIC_API_KEY`. Add the same variable in your Vercel project's Environment Variables when you deploy. If you swap in a new `public/resume.pdf`, the chatbot picks it up automatically — no other changes needed.
 
-To add a new topic: add an entry to the `chatTopics` array in `data/chatbot.ts` with a list of keywords and an `answer()` function. Add a `suggestion` string if you also want it to appear as a quick-reply chip.
+**Without a key**, or if the API call errors or gets rate-limited, the chatbot automatically falls back to the original **rule-based** matcher (`lib/matchChatTopic.ts` + `data/chatbot.ts`) — a keyword-scored lookup against canned answers, no API key or network call required. It matches whole words for single-word keywords (so "yo" won't fire on "you"/"your") and substrings for multi-word phrases, with an honest fallback message when nothing matches. This keeps the widget working out of the box for anyone who clones the repo without setting up a key.
+
+**Cost & abuse guardrails:** `app/api/chat/route.ts` caps message length and conversation length, and applies a best-effort in-memory rate limit (20 messages / 10 min per IP — resets on cold start, not shared across serverless instances, so treat it as a courtesy brake rather than a hard limit). Both the system prompt and the résumé document are cached (`cache_control: ephemeral`) since they're identical across requests within a conversation.
+
+To add a new fallback topic: add an entry to the `chatTopics` array in `data/chatbot.ts` with a list of keywords and an `answer()` function. Add a `suggestion` string if you also want it to appear as a quick-reply chip.
 
 ## The "Live" panel — theming, weather, location & privacy
 
@@ -95,6 +104,26 @@ Everything you'd actually want to change lives in `data/*.ts` — no need to tou
 
 To swap your résumé file, replace `public/resume.pdf` and keep the filename the same (or update `resumeHref` in `data/site.ts`).
 
+**If you attach a custom domain**, update `siteUrl` in `data/site.ts` — it drives `metadataBase`, the OG/canonical URLs, `sitemap.xml`, and `robots.txt`. It currently points at the default Vercel URL as a placeholder.
+
+**Project links**: `data/projects.ts`'s `Project` type has an optional `links` array (`{ label, url }[]`) — set it per project to show clickable links on `ProjectCard` (e.g. "View live", a product page); omit it for client work that can't be public.
+
+## SEO & sharing
+
+- `app/opengraph-image.tsx` and `app/apple-icon.tsx` generate share-preview and home-screen icons on the fly (via `next/og`), styled to match the blueprint theme — no static image asset to keep in sync.
+- `app/sitemap.ts` / `app/robots.ts` generate `/sitemap.xml` and `/robots.txt` from `siteUrl`.
+- `app/layout.tsx` emits a `Person` JSON-LD block (name, role, contact, `sameAs` links to LinkedIn/GitHub) for richer search results.
+
+## Testing & CI
+
+Component and logic tests run on Jest + React Testing Library:
+
+```bash
+npm test
+```
+
+`lib/matchChatTopic.test.ts` covers the FAQ bot's whole-word/phrase matching rules; `components/Highlight.test.tsx` covers the `**bold**` renderer. `.github/workflows/ci.yml` runs lint, tests, and a production build on every push/PR.
+
 ## Fonts
 
 IBM Plex Sans and IBM Plex Mono are loaded via a Google Fonts `<link>` tag in `app/layout.tsx` rather than `next/font/google`, so the build doesn't require network access to Google's font servers at build time. If you'd prefer `next/font` (automatic self-hosting, zero layout shift by default), swap it in once you're building somewhere with normal internet access — it's a drop-in change.
@@ -113,4 +142,4 @@ The easiest deploy path is [Vercel](https://vercel.com/new) (made by the Next.js
 - All copy and metrics reflect real, verified information — nothing was fabricated to fill a placeholder.
 - Motion respects `prefers-reduced-motion`: the hero's draw-in animation and stat counters resolve instantly for anyone who has that setting on.
 - The `/api/geo` and `/api/weather` routes call ipwho.is and Open-Meteo respectively — both free, keyless services — so they need normal outbound internet access from wherever you deploy. Both fail gracefully with clear messages and a "Try again" button if a lookup is blocked or times out.
-- No database or environment variables required — this is a fully static-renderable site except for the two API routes, which are stateless.
+- No database is required. `ANTHROPIC_API_KEY` is the one optional environment variable — everything else, including `/api/geo` and `/api/weather`, needs no configuration.
