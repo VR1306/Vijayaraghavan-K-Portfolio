@@ -95,9 +95,6 @@ export const projects: Project[] = [
       { label: "Frontend repo", url: "https://github.com/VR1306/taskFlow-FE" },
       { label: "Backend repo", url: "https://github.com/VR1306/taskFlow-BE" },
     ],
-    links: [
-      { label: "Mobilytix product page", url: "https://www.comviva.com/products-solutions/martech/mobilytix-real-time-marketing/" },
-      { label: "Telesat Lightspeed portal", url: "https://portal.pathway-sb.telesatlightspeed.net/auth/login" },
-    ],
   },
 ];
+
