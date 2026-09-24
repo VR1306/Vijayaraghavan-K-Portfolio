@@ -10,7 +10,7 @@ export interface Project {
   type: string;
   stack: string[];
   points: string[];
-  /** Public links relevant to this project — live product, docs, repos, etc. */
+  /** Public links relevant to this client project — live product, docs, etc. No repos, since these are client-owned codebases. */
   links?: ProjectLink[];
 }
 
@@ -94,6 +94,10 @@ export const projects: Project[] = [
       { label: "API Docs", url: "https://task-flow-be-eight.vercel.app/api-docs" },
       { label: "Frontend repo", url: "https://github.com/VR1306/taskFlow-FE" },
       { label: "Backend repo", url: "https://github.com/VR1306/taskFlow-BE" },
+    ],
+    links: [
+      { label: "Mobilytix product page", url: "https://www.comviva.com/products-solutions/martech/mobilytix-real-time-marketing/" },
+      { label: "Telesat Lightspeed portal", url: "https://portal.pathway-sb.telesatlightspeed.net/auth/login" },
     ],
   },
 ];

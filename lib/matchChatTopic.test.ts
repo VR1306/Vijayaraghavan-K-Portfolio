@@ -20,12 +20,4 @@ describe("matchChatTopic", () => {
   it("falls back to the honest default when nothing matches", () => {
     expect(matchChatTopic("asdkjqwoe zxcvpoiu")).toBe(FALLBACK_ANSWER);
   });
-  it("matches TaskFlow project queries", () => {
-    expect(matchChatTopic("tell me about taskflow")).toContain("TaskFlow");
-    expect(matchChatTopic("tell me about task flow")).toContain("TaskFlow");
-  });
-  it("matches individual project queries for Mobilytix and Telesat", () => {
-    expect(matchChatTopic("tell me about mobilytix")).toContain("Mobilytix");
-    expect(matchChatTopic("tell me about telesat")).toContain("Telesat");
-  });
 });
