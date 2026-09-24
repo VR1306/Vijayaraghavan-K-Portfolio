@@ -8,9 +8,16 @@ export function ProjectCard({ project }: { project: Project }) {
       </span>
 
       <div className="flex flex-wrap items-baseline justify-between gap-4">
-        <h3 className="text-[1.15rem] font-semibold transition-colors group-hover:text-accent-bright">
-          {project.name}
-        </h3>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <h3 className="text-[1.15rem] font-semibold transition-colors group-hover:text-accent-bright">
+            {project.name}
+          </h3>
+          {project.category && (
+            <span className="border border-line/15 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-accent-bright">
+              {project.category}
+            </span>
+          )}
+        </div>
         <span className="font-mono text-xs text-muted">{project.type}</span>
       </div>
 

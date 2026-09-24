@@ -48,6 +48,21 @@ export const chatTopics: ChatTopic[] = [
         .join("; ")}.`,
   },
   {
+    id: "personal-projects",
+    keywords: ["personal project", "side project", "personal work", "independent project", "taskflow"],
+    suggestion: "Tell me about your personal projects",
+    answer: () => {
+      const personal = projects.filter((p) => p.category === "Personal Project");
+      if (personal.length === 0) return "All featured work is client/production systems.";
+      return personal
+        .map(
+          (p) =>
+            `${p.name} [${p.category}] — ${p.type}. Built with ${p.stack.join(", ")}. ${p.points.join(" ")}`
+        )
+        .join("\n\n");
+    },
+  },
+  {
     id: "projects",
     keywords: ["project", "built", "shipped", "portfolio project"],
     suggestion: "What projects have you built?",
@@ -56,17 +71,18 @@ export const chatTopics: ChatTopic[] = [
         .map((p) => `${p.name} (${p.type})`)
         .join("; ")}. Ask about one by name \u2014 e.g. "tell me about Animeta AI" \u2014 for more detail.`,
   },
-  ...projects.map((p) => ({
-    id: `project-${p.code}`,
-    keywords: [
-      p.name.toLowerCase(),
-      ...p.name
-        .toLowerCase()
-        .split(/\s+/)
-        .filter((w) => /^[a-z0-9]+$/.test(w)),
-    ],
-    answer: () => `${p.name} \u2014 ${p.type}. Built with ${p.stack.join(", ")}. ${p.points.join(" ")}`,
-  })),
+  ...projects.map((p) => {
+    const lower = p.name.toLowerCase();
+    const spaced = p.name.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
+    const words = lower.split(/\s+/).filter((w) => /^[a-z0-9]+$/.test(w));
+    const extra = spaced !== lower ? [spaced] : [];
+
+    return {
+      id: `project-${p.code}`,
+      keywords: Array.from(new Set([lower, ...words, ...extra])),
+      answer: () => `${p.name} \u2014 ${p.type}. Built with ${p.stack.join(", ")}. ${p.points.join(" ")}`,
+    };
+  }),
   {
     id: "security",
     keywords: ["security", "zero trust", "zero-trust", "auth", "token"],
