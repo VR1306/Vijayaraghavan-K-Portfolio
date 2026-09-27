@@ -6,6 +6,8 @@ import { ChatBot } from "@/components/ChatBot";
 import { AmbientSky } from "@/components/AmbientSky";
 import { ThemeAutoSync } from "@/components/ThemeAutoSync";
 import { WeatherProvider } from "@/lib/WeatherProvider";
+import { CursorProvider } from "@/lib/CursorContext";
+import { Cursor3D } from "@/components/Cursor3D";
 import { site, siteUrl } from "@/data/site";
 import "./globals.css";
 
@@ -79,14 +81,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <WeatherProvider>
-            <ThemeAutoSync />
-            <AmbientSky />
-            <div className="blueprint-grid pointer-events-none fixed inset-0 z-0" aria-hidden="true" />
-            <ScrollProgress />
-            <div className="relative z-[1]">{children}</div>
-            <ChatBot />
-          </WeatherProvider>
+          <CursorProvider>
+            <WeatherProvider>
+              <ThemeAutoSync />
+              <AmbientSky />
+              <Cursor3D />
+              <div className="blueprint-grid pointer-events-none fixed inset-0 z-0" aria-hidden="true" />
+              <ScrollProgress />
+              <div className="relative z-[1]">{children}</div>
+              <ChatBot />
+            </WeatherProvider>
+          </CursorProvider>
         </ThemeProvider>
         <Analytics />
       </body>

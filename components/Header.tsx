@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useActiveSection } from "@/lib/useActiveSection";
 import { ThemeToggle } from "./ThemeToggle";
+import { CursorToggle } from "./CursorToggle";
 
 const NAV_ITEMS = [
   { id: "live", label: "Live" },
@@ -46,6 +47,7 @@ export function Header() {
             ))}
           </nav>
 
+          <CursorToggle />
           <ThemeToggle />
 
           <button

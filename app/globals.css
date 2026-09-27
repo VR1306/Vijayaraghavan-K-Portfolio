@@ -86,6 +86,18 @@
   }
 
   /*
+    When the 3D precision cursor is active on fine-pointer devices, hide the
+    native OS arrow/pointer so only the 3D astrolabe/pinpoint is visible.
+    Inputs and textareas retain native I-beam for typing clarity.
+  */
+  @media (pointer: fine) {
+    html.has-3d-cursor,
+    html.has-3d-cursor *:not(input):not(textarea) {
+      cursor: none !important;
+    }
+  }
+
+  /*
     Chrome/Safari paint autofilled inputs (the browser's own saved email,
     name, etc.) with a hardcoded yellow/blue tint that ignores background-color
     entirely — the only reliable override is an inset box-shadow the size of
