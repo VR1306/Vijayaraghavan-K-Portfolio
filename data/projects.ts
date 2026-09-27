@@ -96,5 +96,19 @@ export const projects: Project[] = [
       { label: "Backend repo", url: "https://github.com/VR1306/taskFlow-BE" },
     ],
   },
+  {
+    code: "PRJ-06",
+    name: "AidPro",
+    category: "Personal Project",
+    type: "CPR & first-aid training web app",
+    stack: ["Next.js 16 App Router", "React 19", "TypeScript", "Tailwind CSS v4", "React Compiler"],
+    points: [
+      "Built a CPR and first-aid training app with clear, step-by-step emergency guides covering CPR do's and don'ts, the Heimlich manoeuvre, the Valsalva manoeuvre, the AVPU responsiveness scale, and the log-roll technique.",
+      "Structured each procedure as its own modular section with reusable card, image, navbar, and footer components, statically prerendered on the Next.js App Router for instant loads on any device.",
+    ],
+    links: [
+      { label: "View live", url: "__AIDPRO_URL__" },
+      { label: "Repo", url: "https://github.com/VR1306/aid-pro" },
+    ],
+  },
 ];
-

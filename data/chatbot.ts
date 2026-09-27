@@ -49,7 +49,7 @@ export const chatTopics: ChatTopic[] = [
   },
   {
     id: "personal-projects",
-    keywords: ["personal project", "side project", "personal work", "independent project", "taskflow"],
+    keywords: ["personal project", "side project", "personal work", "independent project", "taskflow", "aidpro", "aid pro", "first aid", "cpr"],
     suggestion: "Tell me about your personal projects",
     answer: () => {
       const personal = projects.filter((p) => p.category === "Personal Project");
