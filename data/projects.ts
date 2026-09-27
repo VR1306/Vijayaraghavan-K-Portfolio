@@ -107,7 +107,7 @@ export const projects: Project[] = [
       "Structured each procedure as its own modular section with reusable card, image, navbar, and footer components, statically prerendered on the Next.js App Router for instant loads on any device.",
     ],
     links: [
-      { label: "View live", url: "__AIDPRO_URL__" },
+      { label: "View live", url: "https://aid-pro-108.vercel.app" },
       { label: "Repo", url: "https://github.com/VR1306/aid-pro" },
     ],
   },
