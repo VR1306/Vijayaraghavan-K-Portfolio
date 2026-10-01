@@ -30,5 +30,14 @@ describe("matchChatTopic", () => {
     expect(matchChatTopic("tell me about mobilytix")).toContain("Mobilytix");
     expect(matchChatTopic("tell me about telesat")).toContain("Telesat");
   });
+
+  it("matches individual project queries for H&M and Bath & Body Works", () => {
+    expect(matchChatTopic("tell me about h&m")).toContain("H&M");
+    expect(matchChatTopic("tell me about hm")).toContain("H&M");
+    expect(matchChatTopic("tell me about the h&m project")).toContain("H&M");
+    expect(matchChatTopic("tell me about bath and body works")).toContain("Bath & Body Works");
+    expect(matchChatTopic("tell me about bath & body works")).toContain("Bath & Body Works");
+    expect(matchChatTopic("tell me about the bath & body works project")).toContain("Bath & Body Works");
+  });
 });
 

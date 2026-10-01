@@ -2,21 +2,21 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  Two real drafting-print conventions, not just an inverted palette:
-  - light = "blueline" diazo print (navy ink on parchment paper)
-  - dark  = cyanotype "blueprint" (paper-white ink on navy)
+  Two architectural drafting-print conventions with regal & professional distinction:
+  - light = "Imperial Vellum & Oxford Navy" — warm ivory parchment with royal navy typography, burnished gold accents, and sapphire drafting lines.
+  - dark  = "Cyanotype Blueprint" — deep sapphire navy with paper-white ink, champagne gold accents, and cyanotype precision lines.
 */
 :root {
-  --surface: #F4F6F5;
-  --surface-deep: #E7ECE9;
-  --ink: #10202F;
-  --ink-dim: #3D5A73;
-  --line: #5B8FB0;
-  --accent: #A6812E;
-  --accent-bright: #8C6A1E;
-  --muted: #5C7488;
-  --on-accent: #F4F6F5;
-  --grid-color: rgba(15, 41, 71, 0.09);
+  --surface: #FAF9F5;
+  --surface-deep: #EFF1EB;
+  --ink: #0A192F;
+  --ink-dim: #2C4768;
+  --line: #2E5C8A;
+  --accent: #9E6E0F;
+  --accent-bright: #845B07;
+  --muted: #536F8B;
+  --on-accent: #FFFFFF;
+  --grid-color: rgba(10, 25, 47, 0.05);
 
   /* Sun palette is deliberately its own warm gold/amber scale, independent
      of --accent (which is tuned for UI text/borders, not a glowing disc) —
@@ -58,6 +58,8 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   /*
@@ -78,6 +80,12 @@
     font-family: var(--font-sans);
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  button, a, input, textarea {
+    touch-action: manipulation;
   }
 
   :focus-visible {
@@ -121,6 +129,14 @@
       linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
     background-size: 48px 48px;
   }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
 /*
@@ -150,7 +166,7 @@
   than a bright cartoon-blue sky clashing with dark chrome.
 */
 .ambient-sky__gradient--day {
-  background: linear-gradient(to bottom, #7ec3ea 0%, #bfe1ef 42%, #eaf4ee 78%, transparent 100%);
+  background: linear-gradient(to bottom, #7ec3ea 0%, #bfe1ef 42%, #FAF9F5 78%, transparent 100%);
 }
 
 .dark .ambient-sky__gradient--day {

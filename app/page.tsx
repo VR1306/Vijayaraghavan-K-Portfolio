@@ -13,7 +13,7 @@ export default function Home() {
       <Header />
       <div id="top" />
       <Hero />
-      <main className="mx-auto max-w-[1040px] px-7">
+      <main className="mx-auto max-w-[1040px] px-4 sm:px-6 md:px-7">
         <LiveReadout />
         <SkillsSection />
         <ProjectsSection />

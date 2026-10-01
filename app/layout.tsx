@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "next-themes";
 import { Analytics } from "@vercel/analytics/next";
 import { ScrollProgress } from "@/components/ScrollProgress";
@@ -8,10 +8,22 @@ import { ThemeAutoSync } from "@/components/ThemeAutoSync";
 import { WeatherProvider } from "@/lib/WeatherProvider";
 import { CursorProvider } from "@/lib/CursorContext";
 import { Cursor3D } from "@/components/Cursor3D";
+import { PwaRegister } from "@/components/PwaRegister";
 import { site, siteUrl } from "@/data/site";
 import "./globals.css";
 
 const titleText = `${site.name} \u2014 ${site.role}`;
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#081B33" },
+    { media: "(prefers-color-scheme: light)", color: "#FAF9F5" },
+  ],
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -26,8 +38,21 @@ export const metadata: Metadata = {
     "Frontend Security",
   ],
   authors: [{ name: site.name, url: site.github }],
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Vijay K",
+  },
   icons: {
-    icon: "/icon.svg",
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
   alternates: {
     canonical: siteUrl,
@@ -93,6 +118,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </WeatherProvider>
           </CursorProvider>
         </ThemeProvider>
+        <PwaRegister />
         <Analytics />
       </body>
     </html>

@@ -18,7 +18,7 @@ export function matchChatTopic(input: string): string {
 
   for (const topic of chatTopics) {
     const score = topic.keywords.reduce((count, keyword) => {
-      const isPhrase = keyword.includes(" ");
+      const isPhrase = keyword.includes(" ") || /[^a-z0-9]/.test(keyword);
       const matched = isPhrase ? normalized.includes(keyword) : words.has(keyword);
       return matched ? count + 1 : count;
     }, 0);

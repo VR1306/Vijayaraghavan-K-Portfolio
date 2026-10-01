@@ -2,18 +2,18 @@ import type { Project } from "@/data/projects";
 
 export function ProjectCard({ project }: { project: Project }) {
   return (
-    <div className="group relative border border-line/15 border-t-0 px-6 py-7 transition-colors first:border-t hover:bg-surface-deep/40 sm:px-7.5">
+    <div className="group relative border border-line/15 border-t-0 px-4.5 py-6 transition-colors first:border-t hover:bg-surface-deep/50 sm:px-7.5 sm:py-7">
       <span className="absolute -right-px -top-px border-b border-l border-line/15 px-2.5 py-1 font-mono text-[11px] tracking-wide text-muted">
         {project.code}
       </span>
 
-      <div className="flex flex-wrap items-baseline justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-2.5">
-          <h3 className="text-[1.15rem] font-semibold transition-colors group-hover:text-accent-bright">
+      <div className="flex flex-wrap items-baseline justify-between gap-3 pr-14 sm:pr-20">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+          <h3 className="text-[1.1rem] sm:text-[1.15rem] font-semibold transition-colors group-hover:text-accent-bright">
             {project.name}
           </h3>
           {project.category && (
-            <span className="border border-line/15 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-accent-bright">
+            <span className="border border-accent/30 bg-accent/5 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-accent-bright">
               {project.category}
             </span>
           )}
@@ -23,7 +23,7 @@ export function ProjectCard({ project }: { project: Project }) {
 
       <div className="mt-3.5 flex flex-wrap gap-2">
         {project.stack.map((tech) => (
-          <span key={tech} className="border border-line/15 px-2.5 py-1 font-mono text-[11px] text-muted">
+          <span key={tech} className="border border-line/15 bg-surface-deep/30 px-2.5 py-1 font-mono text-[11px] text-muted transition-colors group-hover:border-line/25">
             {tech}
           </span>
         ))}
@@ -43,7 +43,7 @@ export function ProjectCard({ project }: { project: Project }) {
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="border-b border-line/15 pb-0.5 text-accent-bright transition-colors hover:border-accent"
+              className="border-b border-line/25 pb-0.5 font-medium text-accent-bright transition-colors hover:border-accent"
             >
               {link.label} &rarr;
             </a>

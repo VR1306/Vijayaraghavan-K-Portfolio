@@ -14,6 +14,7 @@ export const stats: Metric[] = [
 
 export const experienceBullets: string[] = [
   "Architected a Zero-Trust frontend security model with Next.js API proxy routes and automated token refresh, removing client-side exposure of auth tokens across **2 production applications**.",
+  "Led frontend delivery for enterprise accounts including **H&M** and **Bath & Body Works** (via Adobe) and telecom leader **Comviva**, owning architecture, code quality, and on-time releases.",
   "Own end-to-end frontend delivery for enterprise products serving **100K+ monthly active users**, working in Agile/Scrum sprints alongside design, backend, and QA.",
   "Refactored for performance with dynamic code-splitting and lazy loading, reducing initial bundle size by **25\u201330%** and improving First Contentful Paint and Time to Interactive.",
   "Built responsive, real-time analytics dashboards for AI-driven creator platforms, handling large, complex datasets smoothly.",

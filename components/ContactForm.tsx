@@ -42,11 +42,11 @@ export function ContactForm() {
   }
 
   const fieldClasses =
-    "mt-1.5 w-full border border-line/25 bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all duration-200 focus:border-accent focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent-bright)_28%,transparent)]";
+    "mt-1.5 w-full border border-line/25 bg-surface px-3.5 py-2.5 text-[16px] sm:text-sm text-ink outline-none transition-all duration-200 focus:border-accent focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent-bright)_28%,transparent)]";
 
   if (status === "success") {
     return (
-      <div className="relative border border-line/20 bg-surface-deep/70 px-6 py-8 text-center shadow-[0_20px_50px_-28px_rgba(0,0,0,0.4)] backdrop-blur-sm sm:px-8">
+      <div className="relative border border-line/20 bg-surface-deep/70 px-4.5 py-6 text-center shadow-[0_20px_50px_-28px_rgba(0,0,0,0.4)] backdrop-blur-sm sm:px-8 sm:py-8">
         <p className="font-display text-lg font-bold text-ink">Message sent</p>
         <p className="mt-1.5 text-sm text-ink-dim">
           Thanks &mdash; that landed in my inbox. I&apos;ll get back to you soon.
@@ -58,7 +58,7 @@ export function ContactForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="relative border border-line/20 bg-surface-deep/90 px-6 py-7 shadow-[0_20px_50px_-28px_rgba(0,0,0,0.4)] backdrop-blur-sm sm:px-8 sm:py-8"
+      className="relative border border-line/20 bg-surface-deep/90 px-4.5 py-6 shadow-[0_20px_50px_-28px_rgba(0,0,0,0.4)] backdrop-blur-sm sm:px-8 sm:py-8"
     >
       <span className="pointer-events-none absolute -left-1.5 -top-1.5 h-3.5 w-3.5 border-l-2 border-t-2 border-accent-bright" />
       <span className="pointer-events-none absolute -right-1.5 -top-1.5 h-3.5 w-3.5 border-r-2 border-t-2 border-accent-bright" />

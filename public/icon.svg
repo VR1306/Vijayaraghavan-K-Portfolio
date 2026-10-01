@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 26" fill="none">
   <style>
     :root {
-      --accent: #A8632E;
-      --line: #5B8FB0;
+      --accent: #9E6E0F;
+      --line: #2E5C8A;
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --accent: #C97B3D;
-        --line: #74A7C7;
+        --accent: #D6A94E;
+        --line: #5B8FB0;
       }
     }
     .accent-stroke { stroke: var(--accent); }

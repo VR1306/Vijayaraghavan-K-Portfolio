@@ -30,4 +30,29 @@ describe("CursorToggle", () => {
     fireEvent.click(button);
     expect(button.getAttribute("aria-label")).toBe(initialLabel);
   });
+
+  it("opens design switcher dropdown and allows selecting different 3D styles", () => {
+    render(
+      <CursorProvider>
+        <CursorToggle />
+      </CursorProvider>
+    );
+
+    const dropdownTrigger = screen.getByRole("button", { name: /Select cursor design/i });
+    expect(dropdownTrigger).toBeInTheDocument();
+
+    // Open dropdown
+    fireEvent.click(dropdownTrigger);
+    expect(screen.getByText("Tesseract")).toBeInTheDocument();
+    expect(screen.getByText("Compass")).toBeInTheDocument();
+    expect(screen.getByText("Prism")).toBeInTheDocument();
+
+    // Select Tesseract
+    const tesseractOption = screen.getByText("Tesseract");
+    fireEvent.click(tesseractOption);
+
+    // Dropdown should close and trigger should show updated style
+    expect(screen.queryByText("Quantum 4D Hypercube with pulsating vertex nodes and dynamic rotation")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Select cursor design: Tesseract/i })).toBeInTheDocument();
+  });
 });

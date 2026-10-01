@@ -37,7 +37,7 @@ export function LiveReadout() {
         title="A small live demo: local weather, built the privacy-conscious way"
       />
 
-      <div className="border border-line/15 px-6 py-6 sm:px-7.5">
+      <div className="border border-line/15 px-4 py-4.5 sm:px-7.5 sm:py-6">
         {/* Personalization row */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line/15 pb-5">
           {name ? (
@@ -206,15 +206,15 @@ export function LiveReadout() {
                 </div>
 
                 {weather.forecast.length > 0 && (
-                  <div className="mt-6 grid grid-cols-4 gap-px border border-line/15 bg-line/15">
+                  <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-px border border-line/15 bg-line/15">
                     {weather.forecast.map((day) => (
-                      <div key={day.date} className="bg-surface px-2 py-3.5 text-center">
-                        <div className="font-mono text-[11px] text-muted">{formatDay(day.date)}</div>
+                      <div key={day.date} className="bg-surface px-2 py-3 sm:py-3.5 text-center">
+                        <div className="font-mono text-[10.5px] sm:text-[11px] text-muted">{formatDay(day.date)}</div>
                         <WeatherIcon
                           group={describeWeatherCode(day.code).group}
-                          className="mx-auto mt-2 h-5 w-5 text-accent-bright"
+                          className="mx-auto mt-1.5 sm:mt-2 h-5 w-5 text-accent-bright"
                         />
-                        <div className="mt-2 font-mono text-xs text-ink">
+                        <div className="mt-1.5 sm:mt-2 font-mono text-xs text-ink">
                           {Math.round(day.maxC)}&deg;/{Math.round(day.minC)}&deg;
                         </div>
                       </div>
@@ -222,8 +222,8 @@ export function LiveReadout() {
                   </div>
                 )}
 
-                <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-line/15 pt-3.5 font-mono text-[11px] text-muted">
-                  <span>
+                <div className="mt-5 flex flex-wrap items-center justify-between gap-2.5 border-t border-line/15 pt-3.5 font-mono text-[10.5px] sm:text-[11px] text-muted">
+                  <span className="break-words max-w-full">
                     {weather.location?.source === "gps"
                       ? "Location: device GPS (approximate)"
                       : `Location: estimated from IP${weather.location?.city ? ` \u2014 ${weather.location.city}, ${weather.location.country}` : ""}`}

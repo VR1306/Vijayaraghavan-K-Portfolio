@@ -9,12 +9,12 @@ export function RecognitionSection() {
     <section id="recognition" className="scroll-mt-20 pt-14">
       <SectionFrame sheet="SHEET A-06" title="Reviewed, approved" />
 
-      <div className="grid grid-cols-1 items-start gap-10 sm:grid-cols-[240px_1fr]">
+      <div className="grid grid-cols-1 items-start gap-6 sm:gap-10 sm:grid-cols-[240px_1fr]">
         <motion.div
           initial={{ rotate: -8 }}
           whileHover={{ rotate: -4 }}
           transition={{ type: "spring", stiffness: 200, damping: 12 }}
-          className="mx-auto flex h-[206px] w-[206px] items-center justify-center rounded-full border-2 border-dashed border-accent p-5 text-center font-mono text-accent-bright sm:mx-0"
+          className="mx-auto flex h-[180px] w-[180px] sm:h-[206px] sm:w-[206px] items-center justify-center rounded-full border-2 border-dashed border-accent p-4 sm:p-5 text-center font-mono text-accent-bright sm:mx-0"
         >
           <span>
             <span className="mb-2.5 block text-[10px] tracking-wide">APPROVED</span>

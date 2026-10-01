@@ -49,7 +49,15 @@ export const chatTopics: ChatTopic[] = [
   },
   {
     id: "personal-projects",
-    keywords: ["personal project", "side project", "personal work", "independent project", "taskflow", "aidpro", "aid pro", "first aid", "cpr"],
+    keywords: [
+      "personal project",
+      "personal projects",
+      "side project",
+      "side projects",
+      "personal work",
+      "independent project",
+      "independent projects",
+    ],
     suggestion: "Tell me about your personal projects",
     answer: () => {
       const personal = projects.filter((p) => p.category === "Personal Project");
@@ -74,12 +82,25 @@ export const chatTopics: ChatTopic[] = [
   ...projects.map((p) => {
     const lower = p.name.toLowerCase();
     const spaced = p.name.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
-    const words = lower.split(/\s+/).filter((w) => /^[a-z0-9]+$/.test(w));
-    const extra = spaced !== lower ? [spaced] : [];
+    const words = lower
+      .split(/[^a-z0-9]+/)
+      .filter((w) => w.length > 1 && /^[a-z0-9]+$/.test(w));
+    const extra = spaced !== lower ? [spaced, `${spaced} project`] : [];
+    const custom = p.keywords ?? [];
+
+    const projectKeywords = [
+      lower,
+      `${lower} project`,
+      ...words,
+      ...words.map((w) => `${w} project`),
+      ...extra,
+      ...custom,
+      ...custom.map((c) => `${c} project`),
+    ];
 
     return {
       id: `project-${p.code}`,
-      keywords: Array.from(new Set([lower, ...words, ...extra])),
+      keywords: Array.from(new Set(projectKeywords.filter(Boolean))),
       answer: () => `${p.name} \u2014 ${p.type}. Built with ${p.stack.join(", ")}. ${p.points.join(" ")}`,
     };
   }),
