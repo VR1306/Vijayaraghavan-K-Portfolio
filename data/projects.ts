@@ -23,7 +23,7 @@ export const projects: Project[] = [
     stack: ["React.js", "Redux Toolkit", "Axios", "Sass"],
     points: [
       "Built a scalable dashboard layout from modular, reusable UI components, so new features slot in without re-architecting the page.",
-      "Designed Redux Toolkit slices to manage deeply nested subscription data, and rebuilt the checkout flow to remove the friction that was costing conversions.",
+      "Designed Redux Toolkit slices to manage deeply nested subscription data and rebuilt the checkout flow, increasing subscription conversion by 25\u201330%.",
     ],
     links: [{ label: "View live", url: "https://www.yatra.com/prime" }],
   },
